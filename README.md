@@ -103,33 +103,38 @@ Avaliação one-step-ahead sobre o conjunto de teste (430 pregões, 2024-10-23 a
 |---|---|---|---|
 | Naive (baseline) | 0.389 | 0.551 | 1.14% |
 | ARIMA | 0.387 | 0.549 | 1.13% |
-| **LSTM (produção)** | 0.402 | 0.555 | **1.18%** |
+| **LSTM (produção, v2)** | 0.391 | 0.552 | **1.14%** |
 
-Critério de aceite: MAPE de teste ≤ 5% (hard gate) — **passou** (1,18%). O LSTM não supera o
+Critério de aceite: MAPE de teste ≤ 5% (hard gate) — **passou** (1,14%). O LSTM não supera o
 baseline naive/ARIMA neste caso (soft gate, não bloqueia — ver seção 9), mas fica no mesmo
 patamar de erro, validando que o modelo aprendeu um comportamento coerente com a dinâmica real da
 série, sem overfitting nem extrapolação.
 
 ## 6. Documentação da API
 
-Documentação interativa completa (OpenAPI/Swagger) em `/docs` assim que a API estiver no ar.
+Documentação interativa (OpenAPI/Swagger): **https://previsao-acoes-mlops.onrender.com/docs**
 
 ```bash
 # Fluxo principal — a API busca e extrai os dados sozinha a partir do ticker
-curl -X POST http://localhost:8000/predict/by-ticker \
+curl -X POST https://previsao-acoes-mlops.onrender.com/predict/by-ticker \
   -H "Content-Type: application/json" \
   -d '{"ticker": "PETR4.SA"}'
 
 # Health check
-curl http://localhost:8000/health
+curl https://previsao-acoes-mlops.onrender.com/health
 ```
+
+(troque o host por `http://localhost:8000` ao rodar localmente)
 
 Especificação completa de endpoints, schemas e códigos de erro em
 [docs/08-api-especificacao.md](docs/08-api-especificacao.md).
 
 ## 7. Link da API em produção
 
-`TODO: preencher após o deploy (Render/Railway/HF Spaces) — ver docs/09-deploy-mlops.md`
+**https://previsao-acoes-mlops.onrender.com** (deploy via Docker no Render, free tier).
+
+> O serviço "dorme" após ~15 min de inatividade — a primeira requisição seguinte pode levar
+> 30-60s (cold start). Endpoints principais: `/health`, `/docs`, `POST /predict/by-ticker`.
 
 ## 8. Estratégia de monitoramento
 
@@ -147,7 +152,8 @@ gravando `monitoring/reports/monitoring_report_{data}.json`. Detalhes completos 
   2015 (início do treino) e 2026 (período de teste), o scaler ficava com faixa incompatível com o
   preço de teste, e o LSTM extrapolava mal (MAPE de teste ~5-6%, pior que o naive). A correção —
   prever retorno logarítmico em vez de preço absoluto — resolveu o problema (MAPE caiu para
-  1,18%). Ver [docs/03-preprocessamento-eda.md](docs/03-preprocessamento-eda.md) seção 4.
+  ~1,1-1,2%, variando levemente entre re-treinos). Ver
+  [docs/03-preprocessamento-eda.md](docs/03-preprocessamento-eda.md) seção 4.
 - **Superar o baseline naive é notoriamente difícil** para previsão de ponto de um passo à frente
   em preço de fechamento diário de ações líquidas (mercado fracamente eficiente). Por isso esse
   critério é um soft gate (aviso, não bloqueio) — ver
