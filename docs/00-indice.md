@@ -29,6 +29,7 @@ redescobrir decisões de design.
 10. [09-deploy-mlops.md](09-deploy-mlops.md) — pipeline de CI/CD e deploy.
 11. [10-monitoramento-observabilidade.md](10-monitoramento-observabilidade.md) — logging, drift, alertas.
 12. [11-estrutura-projeto.md](11-estrutura-projeto.md) — árvore de diretórios e convenções de código.
+13. [13-roteiro-video.md](13-roteiro-video.md) — roteiro do vídeo de apresentação (5+ min).
 
 ## Status
 
