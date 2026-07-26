@@ -1,0 +1,35 @@
+data:
+  ticker: "PETR4.SA"
+  start_date: "2015-01-01"
+  end_date: null
+  raw_path: "data/raw/{ticker}.csv"
+  processed_dir: "data/processed"
+
+split:
+  test_size_ratio: 0.15
+  validation_size_ratio: 0.15
+
+features:
+  lookback_window: 60
+  target_column: "Close"
+  use_columns: ["Close"]
+
+model:
+  type: "lstm"
+  lstm:
+    units: [64, 32]
+    dropout: 0.2
+    epochs: 100
+    batch_size: 32
+    early_stopping_patience: 10
+    learning_rate: 0.001
+  arima:
+    order: [5, 1, 0]
+
+evaluation:
+  metrics: ["mae", "rmse", "mape"]
+  acceptance:
+    max_mape_pct: 5.0
+    must_beat_naive_baseline: false
+
+random_seed: 42

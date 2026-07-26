@@ -1,0 +1,12 @@
+# requirements-api.txt — apenas o necessário para servir predições em produção
+fastapi==0.139.2
+uvicorn[standard]==0.51.0
+pydantic==2.13.4
+pyyaml==6.0.3
+python-dotenv==1.2.2
+numpy==2.5.1
+scikit-learn==1.9.0
+tensorflow-cpu==2.20.0
+joblib==1.5.3
+pandas==3.0.3
+yfinance==1.5.1

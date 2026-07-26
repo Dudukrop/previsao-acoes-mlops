@@ -1,0 +1,75 @@
+{
+  "version": 2,
+  "ticker": "PETR4.SA",
+  "created_at": "2026-07-26T19:11:01.610261+00:00",
+  "lookback_window": 60,
+  "target_transform": "log_return",
+  "model_path": "models/artifacts/lstm_model_v2.keras",
+  "scaler_path": "models/artifacts/scaler_v2.joblib",
+  "evaluation_metrics": {
+    "mae": 0.39075345184147386,
+    "rmse": 0.5516560324715325,
+    "mape": 1.1375764493928266
+  },
+  "train_close_stats": {
+    "mean": 6.257914524388527,
+    "std": 3.521543972835452
+  },
+  "config_snapshot": {
+    "data": {
+      "ticker": "PETR4.SA",
+      "start_date": "2015-01-01",
+      "end_date": null,
+      "raw_path": "data/raw/{ticker}.csv",
+      "processed_dir": "data/processed"
+    },
+    "split": {
+      "test_size_ratio": 0.15,
+      "validation_size_ratio": 0.15
+    },
+    "features": {
+      "lookback_window": 60,
+      "target_column": "Close",
+      "use_columns": [
+        "Close"
+      ]
+    },
+    "model": {
+      "type": "lstm",
+      "lstm": {
+        "units": [
+          64,
+          32
+        ],
+        "dropout": 0.2,
+        "epochs": 100,
+        "batch_size": 32,
+        "early_stopping_patience": 10,
+        "learning_rate": 0.001
+      },
+      "arima": {
+        "order": [
+          5,
+          1,
+          0
+        ]
+      }
+    },
+    "evaluation": {
+      "metrics": [
+        "mae",
+        "rmse",
+        "mape"
+      ],
+      "acceptance": {
+        "max_mape_pct": 5.0,
+        "must_beat_naive_baseline": false
+      }
+    },
+    "random_seed": 42
+  },
+  "framework_versions": {
+    "tensorflow": "2.20.0",
+    "scikit-learn": "1.9.0"
+  }
+}

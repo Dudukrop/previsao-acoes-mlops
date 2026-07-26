@@ -1,0 +1,19 @@
+# requirements.txt — ambiente de treino/desenvolvimento
+# Versões travadas após pip install real neste projeto (Python 3.13).
+pandas==3.0.3
+numpy==2.5.1
+yfinance==1.5.1
+scikit-learn==1.9.0
+tensorflow-cpu==2.20.0
+statsmodels==0.14.6
+pmdarima==2.1.1
+joblib==1.5.3
+pyyaml==6.0.3
+pydantic==2.13.4
+python-dotenv==1.2.2
+pyarrow==25.0.0
+matplotlib==3.11.1
+fastapi==0.139.2
+uvicorn[standard]==0.51.0
+pytest==9.1.1
+httpx==0.28.1

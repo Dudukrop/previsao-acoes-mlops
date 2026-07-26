@@ -1,0 +1,32 @@
+{
+  "ticker": "PETR4.SA",
+  "evaluated_at": "2026-07-26T19:11:01.553392+00:00",
+  "test_period": {
+    "start": "2024-10-29",
+    "end": "2026-07-24"
+  },
+  "results": {
+    "naive": {
+      "mae": 0.3929699014898242,
+      "rmse": 0.5538588152800962,
+      "mape": 1.1425412664758363
+    },
+    "arima": {
+      "mae": 0.3929699014898242,
+      "rmse": 0.5538588152800962,
+      "mape": 1.1425412664758363
+    },
+    "lstm": {
+      "mae": 0.39075345184147386,
+      "rmse": 0.5516560324715325,
+      "mape": 1.1375764493928266
+    }
+  },
+  "accepted_model": "lstm",
+  "acceptance_criteria": {
+    "max_mape_pct": 5.0,
+    "must_beat_naive_baseline": false
+  },
+  "beats_naive_baseline": true,
+  "passed": true
+}

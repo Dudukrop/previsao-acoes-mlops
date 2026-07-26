@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+data/raw/*.csv
+data/processed/*
+!data/processed/.gitkeep
+monitoring/logs/*.jsonl
+monitoring/reports/*.json
+!monitoring/reports/.gitkeep
+.ipynb_checkpoints/
+models/artifacts/_tmp/
