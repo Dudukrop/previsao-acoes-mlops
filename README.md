@@ -164,7 +164,7 @@ gravando `monitoring/reports/monitoring_report_{data}.json`. Detalhes completos 
 
 ## 10. Vídeo de apresentação
 
-`TODO: preencher com o link do vídeo (5+ min) explicando a estratégia de MLOps empregada`
+**https://drive.google.com/file/d/12thuhq9efhpKF0VuqoE9MR5M_GJncpiF/view?usp=sharing**
 
 ## Documentação técnica completa
 
