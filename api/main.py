@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from api.model_loader import load_active_model
 from api.routers import health, predict
@@ -33,3 +34,10 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(predict.router)
+
+
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    """Sem isso, quem abrir o domínio raiz (sem saber os endpoints de cor) recebe 404 — redireciona
+    para a documentação Swagger, que é o ponto de entrada natural para quem está explorando a API."""
+    return RedirectResponse(url="/docs")

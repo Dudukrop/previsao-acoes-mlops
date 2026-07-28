@@ -131,10 +131,13 @@ Especificação completa de endpoints, schemas e códigos de erro em
 
 ## 7. Link da API em produção
 
-**https://previsao-acoes-mlops.onrender.com** (deploy via Docker no Render, free tier).
+**https://previsao-acoes-mlops.onrender.com/docs** (Swagger — deploy via Docker no Render, free tier).
+
+A raiz do domínio (`https://previsao-acoes-mlops.onrender.com/`) redireciona automaticamente
+para `/docs`. Endpoints principais: `/health`, `/docs`, `POST /predict/by-ticker`.
 
 > O serviço "dorme" após ~15 min de inatividade — a primeira requisição seguinte pode levar
-> 30-60s (cold start). Endpoints principais: `/health`, `/docs`, `POST /predict/by-ticker`.
+> 30-60s (cold start).
 
 ## 8. Estratégia de monitoramento
 
