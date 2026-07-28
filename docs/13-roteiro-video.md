@@ -1,112 +1,97 @@
 # 13 — Roteiro do Vídeo de Apresentação
 
 Roteiro para o vídeo de 5+ minutos exigido na entrega, explicando a estratégia de MLOps
-empregada. Não é um texto para decorar palavra por palavra — são os pontos-chave de cada bloco,
-com tempo sugerido e o que mostrar na tela. Tempo total sugerido: **~6-7 minutos** (dá margem
-confortável acima do mínimo de 5).
+empregada. Cada bloco tem um texto sugerido em bloco de citação — fale com suas próprias
+palavras, não precisa decorar. O texto puro soma **~4,5 minutos** de fala; a demonstração ao vivo
+da API (bloco 7) naturalmente estica isso para além dos 5 minutos mínimos.
 
 Grave com a tela dividida entre você falando (webcam, opcional) e a tela compartilhada mostrando
 o que está descrito em "Mostrar na tela" de cada bloco.
 
 ---
 
-## 1. Abertura (0:00 – 0:20)
+## 1. Abertura (0:00 – 0:15)
 
-**Falar:**
-- Seu nome, o curso/fase ("Machine Learning Engineering — Fase 5"), e o objetivo do vídeo:
-  apresentar o projeto de previsão de cotação de ações e a estratégia de MLOps usada para
-  colocá-lo em produção.
+> "Oi! Esse vídeo é a apresentação do meu projeto da Fase 5 de Machine Learning Engineering: um
+> pipeline completo de MLOps pra prever o preço de fechamento de uma ação, do treino até o
+> deploy em produção."
 
 **Mostrar na tela:** README.md do repositório no GitHub (topo da página).
 
 ---
 
-## 2. Contexto e objetivo (0:20 – 0:50)
+## 2. Contexto e objetivo (0:15 – 0:35)
 
-**Falar:**
-- O desafio: prever o fechamento do próximo pregão de uma ação e servir isso via API, com
-  monitoramento em produção.
-- Por que isso é interessante do ponto de vista de MLOps: não é só treinar um modelo, é a
-  pipeline inteira — coleta, treino, avaliação com critério de aceite, versionamento,
-  containerização, deploy e observabilidade.
+> "O desafio era prever o fechamento do próximo pregão de uma ação e colocar isso em produção de
+> verdade — não só treinar um modelo, mas construir a pipeline inteira: coleta de dados, treino,
+> avaliação com um critério de aceite, versionamento, containerização, deploy e monitoramento."
 
-**Mostrar na tela:** o diagrama de arquitetura do README (seção 3, o mermaid com as 3 fases:
-Offline, Online, Observabilidade).
+**Mostrar na tela:** o diagrama de arquitetura do README (seção 3).
 
 ---
 
-## 3. Empresa escolhida e dados (0:50 – 1:30)
+## 3. Empresa escolhida e dados (0:35 – 0:55)
 
-**Falar:**
-- Ticker escolhido: **PETR4.SA** (Petrobras) — alta liquidez, histórico longo (2015 até hoje),
-  sem lacunas relevantes de pregão.
-- Fonte de dados: `yfinance`, sem custo, sem necessidade de API key.
-- O ticker é 100% configurável (`config.yaml`/`.env`) — trocar de empresa não exige mudar código.
+> "Escolhi a Petrobras, ticker PETR4, por ter bastante liquidez e um histórico longo e contínuo
+> desde 2015. Os dados vêm do Yahoo Finance, e o ticker é totalmente configurável — trocar de
+> empresa não exige mudar nenhuma linha de código."
 
-**Mostrar na tela:** `config.yaml` (bloco `data:`) e rapidamente `src/data_collection/fetch_data.py`.
+**Mostrar na tela:** `config.yaml` (bloco `data:`).
 
 ---
 
-## 4. Algoritmo escolhido (1:30 – 2:15)
+## 4. Algoritmo escolhido (0:55 – 1:35)
 
-**Falar:**
-- Três modelos treinados e comparados no mesmo protocolo: **Naive** (baseline ingênuo), **ARIMA**
-  (baseline estatístico, via `auto_arima`) e **LSTM** (modelo de produção, rede recorrente).
-- Por que os três: ter um baseline estatístico e um ingênuo é o que permite *provar* que o LSTM
-  agrega valor (ou não) — não adianta ter um MAPE bonito sem comparação.
-- A avaliação é sempre **one-step-ahead**: cada previsão usa só dados até o dia anterior,
-  simulando exatamente como a API se comporta em produção.
+> "Treinei e comparei três modelos, todos avaliados da mesma forma. O primeiro é um baseline bem
+> simples, que só chuta que o preço de amanhã é igual ao de hoje — parece bobo, mas é essencial:
+> se o modelo de verdade não bater isso, não faz sentido usar machine learning ali. O segundo é
+> um ARIMA, ajustado automaticamente. E o terceiro, o modelo principal, que fica servindo a API,
+> é uma LSTM — uma rede neural recorrente feita pra aprender padrões em sequências.
+>
+> Comparar os três é o que me permite provar, com números, se a complexidade extra da LSTM
+> realmente compensa. E toda avaliação é 'um passo à frente': o modelo só usa dados até o dia
+> anterior, exatamente como vai se comportar em produção."
 
-**Mostrar na tela:** `src/training/train_lstm.py` (a função `build_lstm_model`) e a tabela
-comparativa do README (seção 5).
+**Mostrar na tela:** a tabela comparativa do README (seção 5).
 
 ---
 
-## 5. A parte mais importante: avaliação, métricas e um bug real encontrado (2:15 – 3:30)
+## 5. Avaliação, métricas e um bug real encontrado (1:35 – 2:20)
 
 Este é o bloco que mais demonstra profundidade de engenharia — não pule.
 
-**Falar:**
-- Métricas usadas: MAE, RMSE e MAPE. MAPE é o critério de aceite (hard gate: só serializa se
-  MAPE de teste ≤ 5%).
-- **A descoberta:** na primeira implementação, o LSTM normalizava o preço absoluto com um
-  `MinMaxScaler` ajustado só no treino. Só que a PETR4 valorizou cerca de **17 vezes** entre 2015
-  (início do treino) e 2026 (período de teste) — então o scaler ficava com uma faixa
-  completamente incompatível com o preço real do teste, e o modelo extrapolava mal. Resultado:
-  MAPE de ~5,9%, **pior que o baseline naive** (~1,1%).
-- **A correção:** trocar o alvo do modelo de preço absoluto para **retorno logarítmico**
-  (`log(Close_t / Close_{t-1})`), que é aproximadamente estacionário e não sofre desse problema
-  de mudança de nível ao longo dos anos. Resultado: MAPE caiu para ~1,14%, no mesmo patamar do
-  ARIMA e do naive.
-- Isso só foi descoberto porque o pipeline foi **executado de ponta a ponta de verdade**, não só
-  especificado — reforça a importância de validar hipóteses com dados reais.
+> "As métricas usadas foram erro absoluto, erro quadrático e o MAPE, que é o erro percentual —
+> meu critério de aceite é MAPE de teste abaixo de 5%.
+>
+> E aqui teve uma descoberta real. Na primeira versão, o LSTM previa o preço absoluto,
+> normalizado por um scaler ajustado só com os dados de treino. Só que a Petrobras valorizou
+> cerca de 17 vezes entre 2015 e 2026, então esse scaler ficava incompatível com o preço de
+> teste, e o modelo errava mais que o baseline simples.
+>
+> A correção foi prever o retorno logarítmico em vez do preço absoluto, o que resolveu o
+> problema e trouxe o MAPE pra 1,14%, no mesmo nível do ARIMA. Isso só apareceu porque rodei o
+> pipeline de ponta a ponta com dados reais, não só no papel."
 
-**Mostrar na tela:** `models/metadata/evaluation_report.json` (o JSON com os 3 modelos e métricas)
-e a seção 4 de `docs/03-preprocessamento-eda.md` (a explicação do bug/correção).
+**Mostrar na tela:** `models/metadata/evaluation_report.json`.
 
 ---
 
-## 6. Serialização, versionamento e ambiente (3:30 – 4:00)
+## 6. Serialização, versionamento e ambiente (2:20 – 2:40)
 
-**Falar:**
-- O modelo aprovado é serializado (`.keras` + `scaler.joblib`) com versionamento incremental
-  (`v1`, `v2`, ...) e metadados completos (métricas, config usada no treino, versões de
-  framework) — permite rollback manual trocando só um ponteiro (`current_version.json`).
-- Ambiente: `requirements.txt` (treino) e `requirements-api.txt` (produção, mais enxuto), e a
-  mesma imagem Docker roda local e em produção.
+> "O modelo aprovado é serializado com versionamento incremental e metadados completos, o que
+> permite fazer rollback manual trocando só um ponteiro. E o ambiente todo — treino e produção —
+> roda a partir da mesma imagem Docker, com dependências travadas em arquivos separados pra
+> treino e pra API."
 
 **Mostrar na tela:** `models/metadata/model_metadata_v2.json` e o `Dockerfile`.
 
 ---
 
-## 7. Demo da API ao vivo (4:00 – 5:00)
+## 7. Demo da API ao vivo (2:40 – 3:50)
 
-**Falar enquanto demonstra:**
-- Abrir a documentação Swagger da API em produção.
-- Mostrar o endpoint principal `/predict/by-ticker` — o cliente manda só o ticker, e é a própria
-  API que busca o histórico recente e monta a previsão (não precisa o cliente montar a janela de
-  preços manualmente).
-- Rodar uma predição ao vivo e mostrar a resposta.
+> "Agora vou mostrar a API rodando de verdade em produção. Esse é o endpoint principal: eu mando
+> só o ticker, e é a própria API que busca o histórico recente e faz a previsão — o cliente não
+> precisa montar nada manualmente."
 
 **Mostrar na tela (ao vivo, no navegador ou terminal):**
 ```bash
@@ -123,42 +108,33 @@ Abrir também `https://previsao-acoes-mlops.onrender.com/docs` e mostrar os sche
 
 ---
 
-## 8. Estratégia de deploy e CI/CD (5:00 – 5:40)
+## 8. Estratégia de deploy e CI/CD (3:50 – 4:15)
 
-**Falar:**
-- Deploy via container Docker no Render, deploy automático a cada push na branch `main`.
-- CI no GitHub Actions: roda os testes automatizados e builda a imagem Docker antes de qualquer
-  deploy real acontecer.
-- Mencionar rapidamente que já passou por outra plataforma (Railway) e a migração foi trivial
-  porque a estratégia é baseada em container — a mesma imagem funciona em qualquer provedor com
-  suporte a Docker.
+> "O deploy é feito via container Docker, com deploy automático a cada push na branch principal.
+> Antes disso, um workflow no GitHub Actions roda os testes automatizados e builda a imagem,
+> garantindo que só vai pro ar o que passou nos testes. Como tudo é baseado em container, migrar
+> de plataforma — como precisei fazer quando o plano gratuito do Railway acabou — foi trivial."
 
-**Mostrar na tela:** aba **Actions** do GitHub (o workflow rodando/verde) e o painel do Render.
+**Mostrar na tela:** aba **Actions** do GitHub e o painel do Render.
 
 ---
 
-## 9. Monitoramento em produção (5:40 – 6:15)
+## 9. Monitoramento em produção (4:15 – 4:40)
 
-**Falar:**
-- Cada predição é logada (`monitoring/logs/predictions.jsonl`) com o valor previsto, a data-alvo,
-  e metadados da entrada.
-- O job `run_monitoring.py` compara, depois que a data-alvo já passou, a previsão com o
-  fechamento real (buscado via yfinance), calcula erro de produção e verifica *drift* de entrada
-  (se os preços recebidos fogem muito da distribuição vista no treino).
+> "Toda predição fica registrada em um log, com o valor previsto e a data-alvo. Um job separado
+> de monitoramento compara, depois que essa data já passou, a previsão com o fechamento real, e
+> verifica se os dados recebidos estão fugindo muito do que o modelo viu no treino."
 
-**Mostrar na tela:** rodar `python -m src.monitoring.run_monitoring` localmente (se já houver
-predições acumuladas) e mostrar o `monitoring_report_*.json` gerado.
+**Mostrar na tela:** rodar `python -m src.monitoring.run_monitoring` e mostrar o
+`monitoring_report_*.json` gerado.
 
 ---
 
-## 10. Encerramento (6:15 – 6:45)
+## 10. Encerramento (4:40 – 5:00)
 
-**Falar:**
-- Resumo rápido: pipeline completo, modelo validado com critério de aceite objetivo, API em
-  produção, monitoramento implementado.
-- Limitações conhecidas (mencionar 1-2, ex.: não considera feriados de bolsa no cálculo da
-  próxima data, sem re-treino automático) — mostra maturidade reconhecer isso.
-- Agradecimento/encerramento.
+> "Resumindo: pipeline completo, modelo validado com um critério de aceite objetivo, API em
+> produção e monitoramento implementado. Existem limitações conhecidas, documentadas no
+> repositório. Obrigado por assistir!"
 
 **Mostrar na tela:** seção 9 do README (Limitações e próximos passos).
 
@@ -170,5 +146,6 @@ predições acumuladas) e mostrar o `monitoring_report_*.json` gerado.
       gravar, evitando esperar o cold start ao vivo).
 - [ ] Repositório GitHub aberto em uma aba.
 - [ ] `evaluation_report.json` e `model_metadata_v2.json` abertos em outra aba/editor.
-- [ ] Terminal com o venv ativado, pronto para rodar comandos ao vivo se quiser.
-- [ ] Cronômetro rodando — o mínimo exigido é 5 minutos, esse roteiro mira ~6-7.
+- [ ] Terminal com o venv ativado, pronto para rodar comandos ao vivo.
+- [ ] Cronômetro rodando — o texto puro soma ~5 min, e a demonstração ao vivo deve levar o vídeo
+      além do mínimo de 5 minutos exigido.
