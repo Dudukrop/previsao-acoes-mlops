@@ -166,8 +166,6 @@ gravando `monitoring/reports/monitoring_report_{data}.json`. Detalhes completos 
 
 `TODO: preencher com o link do vídeo (5+ min) explicando a estratégia de MLOps empregada`
 
-Roteiro sugerido para a gravação em [docs/13-roteiro-video.md](docs/13-roteiro-video.md).
-
 ## Documentação técnica completa
 
 Especificação minuciosa de cada etapa (contratos de função, schemas, decisões de arquitetura) em
